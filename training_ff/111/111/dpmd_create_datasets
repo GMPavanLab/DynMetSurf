@@ -1,0 +1,69 @@
+#!/bin/bash
+
+backup="backup_ordered_data"
+name_train="subset-train"
+name_valid="subset-valid"
+
+ err="[ERROR]  "
+info="[DPMD]   "
+warn="[WARNING]"
+ sep=" ------------------------------------------------- "
+lsep=" ------------------------------------------------------------------- "
+
+if test $# -ne 1; then
+    echo $lsep
+    echo "$err The number of configurations/set is mandatory. Exiting."
+    echo $lsep
+    exit
+fi
+
+ndata=$(cat energy.raw | wc -l)
+nline=$1
+nsets=$(echo "scale=0;($ndata+$nline-1)/$nline" | bc -l )
+train_conf=$(echo "scale=0;(($nsets-1)*$nline)" | bc)
+valid_conf=$(echo "scale=0;($ndata- ($nsets-1)*$nline)" | bc)
+train_perc=$(echo "scale=2; $train_conf/$ndata*100" | bc -l)
+valid_perc=$(echo "scale=2; $valid_conf/$ndata*100" | bc -l)
+
+echo $sep
+echo $info Set generator. Stats about data:
+echo $sep
+echo " - Ndata               = $ndata"
+echo " - Ndata/set           = $nline"
+echo " - Nsets               = $nsets"
+echo " - Training configs    = $train_conf (${train_perc}%)"
+echo " - Validation  configs = $valid_conf (${valid_perc}%)"
+echo $sep
+echo $info Shuffling data. Saving backup in: $backup
+echo $sep
+	rm -r set.* ${name_train}.* ${name_valid}.*
+	mkdir -p $backup
+	files="box.raw force.raw coord.raw energy.raw virial.raw" 
+	for i in $files;
+	do 
+	  ./bck.meup.sh -i $backup/$i
+	  mv $i $backup/
+	done
+	./shuffle_raw.py $backup .
+echo $sep 
+echo $info Creating training configurations
+echo $sep
+	./raw_to_set.sh $nline
+echo $sep
+echo $info Creating training subset: $name_train
+echo $sep
+        train=$(ls -1vd set.* | head -n1)
+        cp -r $train $name_train.000
+        echo $train copied into $name_train.000
+#	raw_to_set.sh $train_conf $name_train
+#	rm -r $name_train.001
+#	echo $name_train.001 deleted
+echo $sep 
+echo $info Creating validation subset: $name_valid
+echo $sep
+	valid=$(ls -1vd set.* | tail -n1)
+	cp -r $valid $name_valid.000
+	echo $valid copied into $name_valid.000
+echo $sep
+echo $info Done.
+echo $sep

@@ -1,0 +1,30 @@
+#!/bin/bash
+# load modules and run simulation
+
+#SBATCH --time=2:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=32
+#SBATCH --ntasks-per-socket=1
+#SBATCH --mem=230000MB
+#SBATCH --partition=m100_usr_prod
+#SBATCH --job-name=110
+#SBATCH --account=Pra23_0028
+##SBATCH --qos=m100_qos_dbg
+#SBATCH --gpus-per-node=4
+#SBATCH --output=outlog # Path for output must already exist
+#SBATCH --error=errlog # Path for errors must already exist
+
+
+module load profile/deeplrn
+module load autoload deepmd
+
+export OMP_NUM_THREADS=32
+export MKL_NUM_THREADS=${OMP_NUM_THREADS}
+
+
+ 
+
+#srun dp train input_Cu.json --init-frz-model Cu-model.pb > log.train
+dp freeze -o Cu_model_finale_seed2.pb
+#srun dp train input.json --restart model.ckpt
