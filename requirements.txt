@@ -8,4 +8,5 @@ matplolib
 seaborn
 ovito
 pandas
+hdbscan
 SOAPify-GMPavanLab @git+ssh://git@github.com/GMPavanLab/SOAPify.git@8103e3f88d54b6e169e13d9ad343a86d03f7eb54
