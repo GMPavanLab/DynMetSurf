@@ -2,7 +2,7 @@
 
 ## Installation for the analysis
 
-Ypu should have set up your pc with python at least at version 3.7.
+You should have set up your pc with python at least at version 3.7.
 Install the requirements with 
 ```bash
 pip install -r requirements
